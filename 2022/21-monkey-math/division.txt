@@ -1,0 +1,7 @@
+root: barb + carl
+barb: emy / jack
+jack: humn / amol
+emy: 8
+humn: 16
+amol: 4
+carl: 2
