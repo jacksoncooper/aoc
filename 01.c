@@ -23,7 +23,9 @@ int sliding_increases()
     int reference, next, insert = 0;
     int window[window_size];
 
-    if (scanf("%i %i %i", window, window + 1, window + 2) != window_size) return 0;
+    if (scanf("%i %i %i", window, window + 1, window + 2) != window_size)
+        return 0;
+
     reference = window[0] + window[1] + window[2];
 
     int increases = 0;
