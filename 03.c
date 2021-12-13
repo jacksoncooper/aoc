@@ -24,10 +24,10 @@ int most_common(char report[][entry_length], int digit)
             );
             return -1;
         };
-        if (zeros < ones) return more_ones;
-        else if (zeros == ones) return neither;
-        else return more_zeros;
     }
+    if (zeros < ones) return more_ones;
+    else if (zeros == ones) return neither;
+    else return more_zeros;
 }
 
 int power_consumption()
@@ -45,7 +45,6 @@ int power_consumption()
 
     for (int digit = 0; digit < entry_length; ++digit) {
         enum common which = most_common(report, digit);
-        printf("which: %i\n", which);
         if (which == neither) {
             printf("abort: malformed digit %i\n", digit + 1);
             return -1;
