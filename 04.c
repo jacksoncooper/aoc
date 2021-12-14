@@ -3,9 +3,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define maximum_boards 512
 #define board_width 5
 #define number_length 2
-#define draws 27
+#define draws 100
+// #define draws 27
 
 int *line_of_integers(FILE *stream, size_t how_many, size_t length)
 {
@@ -46,6 +48,10 @@ Board new(FILE *stream)
 
     for (int line = 0; line < board_width; ++line) {
         int *winners = line_of_integers(stream, board_width, number_length);
+
+        // Assumes we cannot have a partially constructed board.
+        if (winners == NULL) return NULL;
+
         Row row = (Row) malloc(sizeof(Pair) * board_width);
 
         for (int winner = 0; winner < board_width; ++winner) {
@@ -83,34 +89,99 @@ void delete(Board board)
     free(board);
 }
 
+bool row_win(Board board, int row)
+{
+    for (int column = 0; column < board_width; ++column)
+        if (!board[row][column][1]) return false;
+    return true;
+}
+
+bool column_win(Board board, int column)
+{
+    for (int row = 0; row < board_width; ++row)
+        if (!board[row][column][1]) return false;
+    return true;
+}
+
+bool win_at(Board board, int row_intersect, int column_intersect)
+{
+    if (row_win(board, row_intersect)) return true;
+    if (column_win(board, column_intersect)) return true;
+    return false;
+}
+
+Pair find(Board board, int value) {
+    for (int row = 0; row < board_width; ++row) {
+        for (int column = 0; column < board_width; ++column) {
+            if (board[row][column][0] == value) {
+                Pair pair = (Pair) malloc(sizeof(int) * 2);
+                pair[0] = row, pair[1] = column;
+                return pair;
+            }
+        }
+    }
+    return NULL;
+}
+
+int score(Board board) {
+    int score = 0;
+    for (int row = 0; row < board_width; ++row) {
+        for (int column = 0; column < board_width; ++column) {
+                Pair pair = board[row][column];
+                if (!pair[1]) score += pair[0];
+        }
+    }
+    return score;
+}
+
 int main()
 {
-    int *numbers = line_of_integers(stdin, draws, number_length);
-    for (int draw = 0; draw < draws; ++draw) printf("%i ", numbers[draw]);
-    printf("\n");
-    free(numbers);
-
-    printf("\n");
-
+    int *cage = line_of_integers(stdin, draws, number_length);
     scanf("\n");
-    Board first_board = new(stdin);
-    show(first_board);
 
-    printf("\n");
+    Board boards[maximum_boards];
+    Board new_board;
 
-    scanf("\n");
-    Board second_board = new(stdin);
-    show(second_board);
+    int number_of_players = 0;
+    while ((new_board = new(stdin)) != NULL) {
+        boards[number_of_players++] = new_board;
+        scanf("\n");
+    }
 
-    printf("\n");
+    for (int draw = 0; draw < draws; ++draw) {
+        int call = cage[draw];
+        for (int player = 0; player < number_of_players; ++player) {
+            Board board = boards[player];
+            Pair pair;
 
-    scanf("\n");
-    Board third_board = new(stdin);
-    show(third_board);
+            if ((pair = find(board, call)) != NULL) {
+                int row = pair[0], column = pair[1];
 
-    delete(first_board);
-    delete(second_board);
-    delete(third_board);
+                boards[player][row][column][1] = true;
+
+                if (win_at(board, row, column)) {
+                    int unmarked = score(board);
+                    printf(
+                        "[WIN] score %i, call %i, proof %i]\n",
+                        unmarked, call, unmarked * call
+                    );
+                }
+            }
+
+            printf(
+                "[draw %i, a %i] [player %i]\n",
+                draw + 1, call, player + 1
+            );
+            show(board);
+
+            printf("\n");
+        }
+    }
+
+    free(cage);
+ 
+    for (int player = 0; player < number_of_players; ++player)
+        delete(boards[player]);
 
     return 0;
 }
