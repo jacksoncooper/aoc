@@ -10,10 +10,15 @@
 #include <stddef.h>
 #include <stdio.h>
 
-enum common { more_zeros, more_ones, neither };
+enum common { more_zeros, more_ones, neither, malformed };
 
-int most_common(char report[][entry_length], int digit, bool filter[entry_length])
+enum common most_common(char report[][entry_length], int digit, bool filter[entry_length])
 {
+    // TODO: The parameter `filter` is a horrible hack because I didn't read
+    // through the examples and thought the ratings are a function of the bits
+    // of each entry in the diagnostic report, instead of the ones that have
+    // yet to be filtered.
+
     int zeros = 0, ones = 0;
     for (int entry = 0; entry < diagnostic_length; ++entry) {
         if (filter != NULL && !filter[entry]) continue;
@@ -25,7 +30,7 @@ int most_common(char report[][entry_length], int digit, bool filter[entry_length
                 "abort: malformed value '%c' (entry %i, digit %i)\n",
                 value, entry, digit
             );
-            return -1;
+            return malformed;
         };
     }
     if (zeros < ones) return more_ones;
@@ -48,7 +53,7 @@ int power_consumption()
 
     for (int digit = 0; digit < entry_length; ++digit) {
         enum common which = most_common(report, digit, NULL);
-        if (which == -1) return -1;
+        if (which == malformed) return -1;
         if (which == neither) {
             printf("abort: malformed digit %i\n", digit + 1);
             return -1;
@@ -115,7 +120,9 @@ int life_support_rating()
 
     for (int digit = 0; digit < entry_length; ++digit) {
         enum common among_oxygen = most_common(report, digit, oxygen_candidates);
+        if (among_oxygen == malformed) return -1;
         enum common among_scrubber = most_common(report, digit, scrubber_candidates);
+        if (among_scrubber == malformed) return -1;
 
         for (int entry = 0; entry < diagnostic_length; ++entry) {
             char value = report[entry][digit];
