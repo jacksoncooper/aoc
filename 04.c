@@ -1,5 +1,3 @@
-// TODO: I have no idea what's wrong here I'm switching to Rust.
-
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -15,15 +13,15 @@ int *line_of_integers(FILE *stream, size_t how_many, size_t length)
     size_t line_length = (length + 1) * how_many + 2;
 
     char *line = (char *) malloc(line_length);
-
     fgets(line, line_length, stream);
+    if (line == NULL) return NULL;
 
     const char delimeters[] = " ,\n";
 
     const char *more = strtok(line, delimeters);
     if (more == NULL) return NULL;
 
-    int *numbers = (int *) malloc(how_many);
+    int *numbers = (int *) malloc(sizeof(int) * how_many);
 
     size_t at = 0;
     numbers[at++] = atoi(more);
@@ -66,12 +64,23 @@ Board new(FILE *stream)
 void show(Board board)
 {
     for (int row = 0; row < board_width; ++row) {
-        for (int entry = 0; entry < board_width; ++entry) {
-            Pair pair = board[row][entry];
+        for (int column = 0; column < board_width; ++column) {
+            Pair pair = board[row][column];
             printf("%2i (%c) ", pair[0], pair[1] ? '*' : '_');
         }
         printf("\n");
     }
+}
+
+void delete(Board board)
+{
+    for (int row = 0; row < board_width; ++row) {
+        for (int column = 0; column < board_width; ++column) {
+            free(board[row][column]);
+        }
+        free(board[row]);
+    }
+    free(board);
 }
 
 int main()
@@ -98,6 +107,10 @@ int main()
     scanf("\n");
     Board third_board = new(stdin);
     show(third_board);
+
+    delete(first_board);
+    delete(second_board);
+    delete(third_board);
 
     return 0;
 }
