@@ -148,6 +148,10 @@ int main()
         scanf("\n");
     }
 
+    bool *turned_in = (bool *) malloc(sizeof(bool) * number_of_players);
+    for (int player = 0; player < number_of_players; ++player)
+        turned_in[player] = false;
+
     for (int draw = 0; draw < draws; ++draw) {
         int call = cage[draw];
         for (int player = 0; player < number_of_players; ++player) {
@@ -159,26 +163,22 @@ int main()
 
                 boards[player][row][column][1] = true;
 
-                if (win_at(board, row, column)) {
+                if (!turned_in[player] && win_at(board, row, column)) {
+                    turned_in[player] = true;
                     int unmarked = score(board);
                     printf(
-                        "[WIN] score %i, call %i, proof %i]\n",
-                        unmarked, call, unmarked * call
+                        "Win! on draw %i at %i for player %i with score %i.\n",
+                        draw + 1, call, player + 1, unmarked * call
                     );
+                    show(board);
+                    printf("\n");
                 }
             }
-
-            printf(
-                "[draw %i, a %i] [player %i]\n",
-                draw + 1, call, player + 1
-            );
-            show(board);
-
-            printf("\n");
         }
     }
 
     free(cage);
+    free(turned_in);
  
     for (int player = 0; player < number_of_players; ++player)
         delete(boards[player]);
