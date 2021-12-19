@@ -47,11 +47,13 @@ struct line *read_line(FILE *stream)
     return new_line;
 }
 
-struct line* *read_lines(FILE *stream, int *how_many)
+struct line *read_lines(FILE *stream, int *how_many)
 {
-    struct line* *lines = (struct line* *) malloc(sizeof(struct line *) * max_lines);
-    int line = 0; while ((lines[line++] = read_line(stdin)) != NULL);
-    *how_many = line - 1;
+    struct line *lines = (struct line *) malloc(sizeof(struct line) * max_lines);
+    int line = 0; struct line *new_line;
+    while ((new_line = read_line(stdin)) != NULL)
+        lines[line++] = *new_line;
+    *how_many = line;
     return lines;
 }
 
@@ -65,13 +67,14 @@ void show(FILE* stream, struct line *line)
 
 int main()
 {
-    int how_many; struct line* *lines = read_lines(stdout, &how_many);
+    int how_many; struct line *lines = read_lines(stdout, &how_many);
     printf("read %i lines\n", how_many);
 
     int maximum_x = 0, maximum_y = 0;
     for (int line = 0; line < how_many; ++line) {
-        int x_1 = lines[line] -> x_1, x_2 = lines[line] -> x_2;
-        int y_1 = lines[line] -> y_1, y_2 = lines[line] -> y_2;
+        struct line current = lines[line];
+        int x_1 = current.x_1, x_2 = current.x_2;
+        int y_1 = current.y_1, y_2 = current.y_2;
         int current_x = max(x_1, x_2), current_y = max(y_1, y_2);
         maximum_x = max(maximum_x, current_x);
         maximum_y = max(maximum_y, current_y);
@@ -79,8 +82,8 @@ int main()
     printf("maximum_x: %i, maximum_y: %i\n", maximum_x, maximum_y);
     ++maximum_x, ++maximum_y;
 
-    for (int line = 0; line < 8; ++line)
-        show(stdout, lines[line]), printf("\n");
+    for (int line = 0; line < 4; ++line)
+        show(stdout, &lines[line]), printf("\n");
     printf("(rest elided)\n");
 
     int* *rows = (int* *) malloc(sizeof(int *) * maximum_y);
@@ -91,9 +94,10 @@ int main()
     }
 
     for (int line = 0; line < how_many; ++line) {
-        arrange(lines[line]);
-        int x_1 = lines[line] -> x_1, x_2 = lines[line] -> x_2;
-        int y_1 = lines[line] -> y_1, y_2 = lines[line] -> y_2;
+        struct line current = lines[line];
+        arrange(&current);
+        int x_1 = current.x_1, x_2 = current.x_2;
+        int y_1 = current.y_1, y_2 = current.y_2;
         int rise = y_2 - y_1, run = x_2 - x_1;
     
         // Vertical line.
@@ -133,7 +137,6 @@ int main()
     for (int row = 0; row < maximum_y; ++row) free(rows[row]);
     free(rows);
 
-    for (int line = 0; line < how_many; ++line) free(lines[line]);
     free(lines);
 
     return 0;
