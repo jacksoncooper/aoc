@@ -1,6 +1,10 @@
-use std::io::{stdin, Read, BufRead, BufReader};
+mod utility;
+
 use std::error::Error;
+use std::io::{Read, stdin};
 use std::str::FromStr;
+
+use utility::read_line;
 
 const NOC: usize = 9;          // Number of clocks.
 const DTM: usize = 2;          // Days to maturity.
@@ -12,18 +16,6 @@ fn main() -> Result<(), Box<dyn Error>>
     let population: u64 = simulate(stdin(), days)?;
     println!("After {} days, there are {} lanternfish.", days, population);
     Ok(())
-}
-
-fn read_line<R : Read>(reader: R) -> std::io::Result<String>
-{
-    let mut buffer = String::new();
-    match BufReader::new(reader).read_line(&mut buffer) {
-        Ok(bytes_read) => {
-            println!("Read {} bytes of input.", bytes_read);
-            Ok(buffer)
-        },
-        Err(error) => Err(error)
-    }
 }
 
 fn make_clocks(line: String) -> Result<Clocks, <u64 as FromStr>::Err>
@@ -41,8 +33,8 @@ fn make_clocks(line: String) -> Result<Clocks, <u64 as FromStr>::Err>
 fn simulate<R: Read>(reader: R, days: u64) -> Result<u64, Box<dyn Error>>
 {
     // [0, 1, 2, 3, 4, 5, 6, 7, 8]
-    // ^                  |     ^
-    // time to spawn            time to mature
+    //                 ^  |     ^
+    //     time to spawn  |     time to mature
 
     let mut clocks = make_clocks(read_line(reader)?)?;
 
