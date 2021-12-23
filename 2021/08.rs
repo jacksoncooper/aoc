@@ -1,8 +1,9 @@
+use std::collections::HashMap;
 use std::error::Error;
 use std::io::{stdin, Read, BufRead, BufReader};
 
 //                              0  1  2  3  4  5  6  7  8  9
-static SEGMENTS_IN: [u8; 10] = [6, 2, 5, 5, 4, 5, 6, 3, 7, 6];
+// static SEGMENTS_IN: [u8; 10] = [6, 2, 5, 5, 4, 5, 6, 3, 7, 6];
 
 #[derive(Debug)]
 struct Display
@@ -33,7 +34,8 @@ fn make_display(line: String) -> Display
     Display { digits, display }
 }
 
-fn make_displays<R: Read>(mut reader: R) -> std::io::Result<Vec<Display>> {
+fn make_displays<R: Read>(reader: R) -> std::io::Result<Vec<Display>>
+{
     let mut displays = Vec::new();
     let buffered = BufReader::new(reader);
     for line in buffered.lines() {
@@ -42,17 +44,31 @@ fn make_displays<R: Read>(mut reader: R) -> std::io::Result<Vec<Display>> {
     Ok(displays)
 }
 
-fn part_one() -> std::io::Result<()>
+fn part_one() -> std::io::Result<u32>
 {
+    let mut to_known_digit: HashMap<usize, u8> = HashMap::new();
+    to_known_digit.insert(2, 1);
+    to_known_digit.insert(4, 4);
+    to_known_digit.insert(3, 7);
+    to_known_digit.insert(7, 8);
+
+    let mut known_digits: u32 = 0;
     for display in make_displays(stdin())? {
-        println!("{:#?}", display);
+        for digit in display.display.iter() {
+            if let Some(segments) = to_known_digit.get(&digit.len()) {
+                if vec![1, 4, 7, 8].contains(segments) {
+                    known_digits += 1;
+                }
+            }
+        }
     }
 
-    Ok(())
+    Ok(known_digits)
 }
 
 fn main() -> Result<(), Box<dyn Error>>
 {
-    part_one()?;
+    let known_digits = part_one()?;
+    println!("There are {} known digits displayed on the submarine's screens.", known_digits);
     Ok(())
 }
