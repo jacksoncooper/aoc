@@ -1,16 +1,13 @@
-mod utility;
-
 use std::collections::HashMap;
 use std::error::Error;
-use std::io::{stdin};
+use std::io::{stdin, BufRead, BufReader};
 use std::str::FromStr;
-
-use utility::read_line;
 
 fn main() -> Result<(), Box<dyn Error>>
 {
-    let input = read_line(stdin())?;
-    let counts = make_counts(input)?;
+    let mut line = String::new();
+    BufReader::new(stdin()).read_line(&mut line)?;
+    let counts = make_counts(line)?;
     let (position, fuel) = minimum_fuel_for_maneuver(&counts, true);
     println!("🦀s go to position {} using {} fuel.", position, fuel);
     Ok(())

@@ -1,10 +1,6 @@
-mod utility;
-
 use std::error::Error;
-use std::io::{Read, stdin};
+use std::io::{stdin, Read, BufRead, BufReader};
 use std::str::FromStr;
-
-use utility::read_line;
 
 const NOC: usize = 9;          // Number of clocks.
 const DTM: usize = 2;          // Days to maturity.
@@ -36,7 +32,9 @@ fn simulate<R: Read>(reader: R, days: u64) -> Result<u64, Box<dyn Error>>
     //                 ^  |     ^
     //     time to spawn  |     time to mature
 
-    let mut clocks = make_clocks(read_line(reader)?)?;
+    let mut line = String::new();
+    BufReader::new(reader).read_line(&mut line)?;
+    let mut clocks = make_clocks(line)?;
 
     for _ in 0..days {
         let ready_to_spawn: u64 = clocks[0];
