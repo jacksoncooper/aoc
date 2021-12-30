@@ -1,8 +1,7 @@
+#include <limits.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-#include <limits.h>
 
 #define LINE 128
 #define LINES 128
@@ -61,7 +60,7 @@ int part_one()
 
     int high_score = 0;
     char panicked_at = '\0';
-    char line[LINE + 2], unmatched[LINE + 2];
+    char line[LINE + 2], unmatched[LINE + 1];
 
     while (fgets(line, LINE + 2, stdin) != NULL) {
         if (validate_line(line, &panicked_at, unmatched) == invalid) {
@@ -74,8 +73,8 @@ int part_one()
 
 int less_than(const void* l, const void* r)
 {
-     int a = *((int *) l);
-     int b = *((int *) r);
+     long int a = *((long int *) l);
+     long int b = *((long int *) r);
 
      if (a == b) return  0;
      if (a <  b) return -1;
@@ -92,7 +91,7 @@ long int part_two()
 
     long int scores[LINES] = { 0 };
     char panicked_at = '\0';
-    char line[LINE + 2], unmatched[LINE + 2];
+    char line[LINE + 2], unmatched[LINE + 1];
 
     long int score = 0;
     while (fgets(line, LINE + 2, stdin) != NULL) {
@@ -101,14 +100,13 @@ long int part_two()
                 scores[score] *= 5L;
                 scores[score] += points[unmatched[i]];
             }
-            printf("%li\n", scores[score]);
             ++score;
         }
     }
 
     qsort(scores, score, sizeof(long int), less_than);
 
-    // Guaranteed odd score.
+    // Guaranteed odd number of incomplete lines.
     return scores[(score - 1) / 2];
 }
 
