@@ -1,0 +1,16 @@
+{
+  "name": "aoc-2023",
+  "version": "1.0.0",
+  "description": "Off to the stars we go!",
+  "main": "index.js",
+  "scripts": {
+    "//": "usage: DAY=01 npm run day -- 01-input.txt",
+    "day": "npx tsc && node ./build/$(ls build | grep $DAY | head -n 1)"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^20.10.4",
+    "typescript": "^5.3.3"
+  }
+}
