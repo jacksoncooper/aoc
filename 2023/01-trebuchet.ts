@@ -18,16 +18,16 @@ function partOne(lines: string[]) : Number {
     return numbers.reduce((rest, value) => rest + value);
 }
 
-function calibrationHalf(line: string, values: Map<string, number>) : number | null {
-    let value: string | null = null;
-    let valuePosition: number | null = null;
+function calibrationHalf(line: string, tokens: Map<string, number>) : number | null {
+    type Value = { token: string, position: number };
 
-    for (const candidate of values.keys()) {
-        const candidatePosition = line.indexOf(candidate);
-        if (candidatePosition !== -1) {
-            if (valuePosition === null || candidatePosition < valuePosition) {
-                value = candidate;
-                valuePosition = candidatePosition;
+    let value: Value | null = null;
+    for (const token of tokens.keys()) {
+        const position = line.indexOf(token);
+        const candidate: Value = { token, position };
+        if (candidate.position !== -1) {
+            if (value === null || candidate.position < value.position) {
+                value = { token: candidate.token, position: candidate.position };
             }
         }
     }
@@ -35,7 +35,7 @@ function calibrationHalf(line: string, values: Map<string, number>) : number | n
         return null;
     }
 
-    const digit = values.get(value);
+    const digit = tokens.get(value.token);
     if (digit === undefined) {
         return null;
     }
@@ -43,7 +43,7 @@ function calibrationHalf(line: string, values: Map<string, number>) : number | n
     return digit;
 }
 
-function partTwo(lines: string[]) : Number {
+function partTwo(lines: string[]) : number {
     const contents: [string, number][] = [
         ["1", 1], ["2", 2], ["3", 3],
         ["4", 4], ["5", 5], ["6", 6],
@@ -53,16 +53,16 @@ function partTwo(lines: string[]) : Number {
         ["seven", 7], ["eight", 8], ["nine", 9],
     ];
 
-    const values: Map<string, number> = new Map(contents);
-    const backwardValues = new Map(contents.map(
+    const tokens: Map<string, number> = new Map(contents);
+    const backwardTokens = new Map(contents.map(
         ([token, value]) => [Array.from(token).toReversed().join(''), value]
     ));
 
     const numbers = lines.map(line => {
         const backward = Array.from(line).toReversed().join('');
-        const firstHalf = calibrationHalf(line, values);
+        const firstHalf = calibrationHalf(line, tokens);
         assert(firstHalf !== null);
-        const lastHalf =  calibrationHalf(backward, backwardValues);
+        const lastHalf =  calibrationHalf(backward, backwardTokens);
         assert(lastHalf !== null);
         return firstHalf * 10 + lastHalf;
     });
