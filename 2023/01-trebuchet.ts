@@ -2,7 +2,7 @@ import * as fs from "node:fs";
 import * as process from "node:process";
 import assert from "node:assert";
 
-function partOne(lines: string[]) : Number {
+function partOne(lines: string[]) : number {
     // There don't seem to be any zeros in the calibration values!
 
     const numbers = lines.map(line => {
