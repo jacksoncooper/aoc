@@ -90,7 +90,7 @@ function isPartNumber(schematic: string[], part: Part) : boolean {
 type AdjacentParts = { mark: Mark, parts: Part[] };
 
 function adjacentParts(schematic: string[], parts: Part[]) : AdjacentParts[] {
-    const markToParts: Map<string, { mark: Mark, parts: Part[] }>  = new Map();
+    const markToParts: Map<string, { mark: Mark, parts: Part[] }> = new Map();
 
     for (const part of parts) {
         for (const mark of adjacentMarks(schematic, part)) {
