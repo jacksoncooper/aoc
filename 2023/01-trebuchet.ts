@@ -10,7 +10,7 @@ function partOne(lines: string[]) : number {
             .filter(value => value.match(/\d/))
             .join('');
 
-        // Danger: UTF-16 code units!
+        // Danger: UTF-16 string indexing!
         assert(value.length > 0);
         return Number(value.at(0)! + value.at(-1)!);
     });
